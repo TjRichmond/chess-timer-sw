@@ -3,7 +3,7 @@
  * @brief   Module for max7219 8-digit LED Display Driver
  */
 
-#include "stm32u0xx_hal_max7219.h"
+#include "hal_max7219.h"
 
 HAL_StatusTypeDef HAL_MAX7219_Init(
   MAX7219_HandleTypeDef *hmax7219)

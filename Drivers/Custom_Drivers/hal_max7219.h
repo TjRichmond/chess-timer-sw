@@ -3,8 +3,8 @@
  * @brief   Header for stm32u0xx_hal_max7219.h file
  *          This file constains the common defines of the max7219 IC.
  */
-#ifndef STM32U0xx_HAL_MAX7219_H
-#define STM32U0xx_HAL_MAX7219_H
+#ifndef _HAL_MAX7219_H
+#define _HAL_MAX7219_H
 
 #ifdef __cplusplus
 extern "C" {

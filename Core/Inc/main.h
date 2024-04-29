@@ -32,7 +32,7 @@ extern "C" {
 
 /* Private includes ----------------------------------------------------------*/
 /* USER CODE BEGIN Includes */
-#include "stm32u0xx_hal_max7219.h"
+
 /* USER CODE END Includes */
 
 /* Exported types ------------------------------------------------------------*/
@@ -68,6 +68,8 @@ void Error_Handler(void);
 #define OSC_OUT_GPIO_Port GPIOF
 #define MAX1719_CS_Pin GPIO_PIN_8
 #define MAX1719_CS_GPIO_Port GPIOA
+#define TEST_PIN_Pin GPIO_PIN_9
+#define TEST_PIN_GPIO_Port GPIOA
 #define WHITE_BUTTON_Pin GPIO_PIN_10
 #define WHITE_BUTTON_GPIO_Port GPIOA
 #define WHITE_BUTTON_EXTI_IRQn EXTI4_15_IRQn
