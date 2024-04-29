@@ -66,7 +66,8 @@ Drivers/STM32U0xx_HAL_Driver/Src/stm32u0xx_hal_uart.c \
 Core/Src/system_stm32u0xx.c \
 Core/Src/sysmem.c \
 Core/Src/syscalls.c \
-Drivers/BSP/Components/max7219.c
+Core/Src/max7219.c \
+Drivers/STM32U0xx_HAL_Driver/Src/stm32u0xx_hal_max7219.c
 
 # ASM sources
 ASM_SOURCES =  \
@@ -132,8 +133,7 @@ C_INCLUDES =  \
 -IDrivers/STM32U0xx_HAL_Driver/Inc/Legacy \
 -IDrivers/BSP/STM32U0xx_Nucleo \
 -IDrivers/CMSIS/Device/ST/STM32U0xx/Include \
--IDrivers/CMSIS/Include \
--IDrivers/BSP/Components
+-IDrivers/CMSIS/Include
 
 
 # compile gcc flags
