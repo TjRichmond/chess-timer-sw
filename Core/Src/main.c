@@ -25,15 +25,12 @@
 /* Private includes ----------------------------------------------------------*/
 /* USER CODE BEGIN Includes */
 #include "hal_max7219.h"
+#include "chess.h"
 /* USER CODE END Includes */
 
 /* Private typedef -----------------------------------------------------------*/
 /* USER CODE BEGIN PTD */
-typedef enum
-{
-  WHITE_TURN,
-  BLACK_TURN
-} TurnTypeDef;
+
 /* USER CODE END PTD */
 
 /* Private define ------------------------------------------------------------*/
@@ -49,9 +46,7 @@ typedef enum
 /* Private variables ---------------------------------------------------------*/
 
 /* USER CODE BEGIN PV */
-uint32_t white_10_ms_tick = 50000;
-uint32_t black_10_ms_tick = 50000;
-uint8_t chess_turn = WHITE_TURN;
+ChessGame Game;
 /* USER CODE END PV */
 
 /* Private function prototypes -----------------------------------------------*/
@@ -106,6 +101,9 @@ int main(void)
 
   HAL_TIM_Base_Start_IT(&htim6);
 
+  Game.WhiteTick10ms = 10000;
+  Game.BlackTick10ms = 10000;
+
   /* USER CODE END 2 */
 
   /* Initialize leds */
@@ -115,21 +113,7 @@ int main(void)
   /* USER CODE BEGIN WHILE */
   while (1)
   {
-    /*! Update display every 1 s */
-    if (chess_turn == WHITE_TURN)
-    {
-      if (white_10_ms_tick % 100 == 0)
-      {
-        HAL_MAX7219_WriteInt(&hmax7219, ((white_10_ms_tick / 100) * 10000) + black_10_ms_tick / 100);
-      }
-    }
-    else
-    {
-      if (black_10_ms_tick % 100 == 0)
-      {
-        HAL_MAX7219_WriteInt(&hmax7219, ((white_10_ms_tick / 100) * 10000) + black_10_ms_tick / 100);
-      }
-    }
+    GameLoop(&hmax7219, &Game);
     /* USER CODE END WHILE */
 
     /* USER CODE BEGIN 3 */
@@ -178,13 +162,13 @@ void SystemClock_Config(void)
 /* USER CODE BEGIN 4 */
 void HAL_GPIO_EXTI_Rising_Callback(uint16_t GPIO_Pin)
 {
-  if (GPIO_Pin == WHITE_BUTTON_Pin && chess_turn == WHITE_TURN)
+  if (GPIO_Pin == WHITE_BUTTON_Pin && Game.GameState == WHITE_TURN)
   {
-    chess_turn = BLACK_TURN;
+    Game.GameState = BLACK_TURN;
   }
-  if (GPIO_Pin == BLACK_BUTTON_Pin && chess_turn == BLACK_TURN)
+  if (GPIO_Pin == BLACK_BUTTON_Pin && Game.GameState == BLACK_TURN)
   {
-    chess_turn = WHITE_TURN;
+    Game.GameState = WHITE_TURN;
   }
 }
 
@@ -192,13 +176,13 @@ void HAL_TIM_PeriodElapsedCallback(TIM_HandleTypeDef *htim)
 {
   if (htim->Instance == TIM6)
   {
-    if (chess_turn == WHITE_TURN)
+    if (Game.GameState == WHITE_TURN)
     {
-      white_10_ms_tick++;
+      Game.WhiteTick10ms++;
     }
     else
     {
-      black_10_ms_tick++;
+      Game.BlackTick10ms++;
     }
   }
 }
