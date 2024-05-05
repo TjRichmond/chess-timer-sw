@@ -32,7 +32,7 @@ extern "C"
     MAX7219_ADDRESS_INTENSITY = 0x0A,
     MAX7219_ADDRESS_SCAN_LIMIT = 0x0B,
     MAX7219_ADDRESS_SHUTDOWN = 0x0C,
-    MAX7219_ADDRESS_DISPLAY_TEST = 0x0F,
+    MAX7219_ADDRESS_DISPLAY_TEST = 0x0F
   } MAX7219_AddressTypeDef;
 
   /**
@@ -178,7 +178,7 @@ extern "C"
   HAL_StatusTypeDef HAL_MAX7219_IntToBCD(
       MAX7219_HandleTypeDef *hmax7219,
       uint32_t int_value);
-      
+
   HAL_StatusTypeDef HAL_MAX7219_WriteInt(
     MAX7219_HandleTypeDef *hmax7219,
     uint32_t int_value);

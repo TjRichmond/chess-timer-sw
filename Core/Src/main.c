@@ -29,7 +29,11 @@
 
 /* Private typedef -----------------------------------------------------------*/
 /* USER CODE BEGIN PTD */
-
+typedef enum
+{
+  WHITE_TURN,
+  BLACK_TURN
+} TurnTypeDef;
 /* USER CODE END PTD */
 
 /* Private define ------------------------------------------------------------*/
@@ -45,7 +49,9 @@
 /* Private variables ---------------------------------------------------------*/
 
 /* USER CODE BEGIN PV */
-uint32_t ten_ms_tick = 0;
+uint32_t white_10_ms_tick = 50000;
+uint32_t black_10_ms_tick = 50000;
+uint8_t chess_turn = WHITE_TURN;
 /* USER CODE END PV */
 
 /* Private function prototypes -----------------------------------------------*/
@@ -99,7 +105,7 @@ int main(void)
   HAL_MAX7219_Init(&hmax7219);
 
   HAL_TIM_Base_Start_IT(&htim6);
-  // HAL_TIM_Base_Start(&htim6);
+
   /* USER CODE END 2 */
 
   /* Initialize leds */
@@ -109,10 +115,20 @@ int main(void)
   /* USER CODE BEGIN WHILE */
   while (1)
   {
-    /*! Toggle heartbeat LED every 1 s */
-    if(ten_ms_tick % 100 == 0) 
+    /*! Update display every 1 s */
+    if (chess_turn == WHITE_TURN)
     {
-      HAL_MAX7219_WriteInt(&hmax7219, ten_ms_tick/100);
+      if (white_10_ms_tick % 100 == 0)
+      {
+        HAL_MAX7219_WriteInt(&hmax7219, ((white_10_ms_tick / 100) * 10000) + black_10_ms_tick / 100);
+      }
+    }
+    else
+    {
+      if (black_10_ms_tick % 100 == 0)
+      {
+        HAL_MAX7219_WriteInt(&hmax7219, ((white_10_ms_tick / 100) * 10000) + black_10_ms_tick / 100);
+      }
     }
     /* USER CODE END WHILE */
 
@@ -160,12 +176,30 @@ void SystemClock_Config(void)
 }
 
 /* USER CODE BEGIN 4 */
+void HAL_GPIO_EXTI_Rising_Callback(uint16_t GPIO_Pin)
+{
+  if (GPIO_Pin == WHITE_BUTTON_Pin && chess_turn == WHITE_TURN)
+  {
+    chess_turn = BLACK_TURN;
+  }
+  if (GPIO_Pin == BLACK_BUTTON_Pin && chess_turn == BLACK_TURN)
+  {
+    chess_turn = WHITE_TURN;
+  }
+}
+
 void HAL_TIM_PeriodElapsedCallback(TIM_HandleTypeDef *htim)
 {
   if (htim->Instance == TIM6)
   {
-    // HAL_GPIO_TogglePin(TEST_PIN_GPIO_Port, TEST_PIN_Pin);
-    ten_ms_tick++;
+    if (chess_turn == WHITE_TURN)
+    {
+      white_10_ms_tick++;
+    }
+    else
+    {
+      black_10_ms_tick++;
+    }
   }
 }
 /* USER CODE END 4 */
