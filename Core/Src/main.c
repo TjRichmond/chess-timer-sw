@@ -45,7 +45,7 @@
 /* Private variables ---------------------------------------------------------*/
 
 /* USER CODE BEGIN PV */
-uint32_t  white_alarm = 0;
+uint32_t ten_ms_tick = 0;
 /* USER CODE END PV */
 
 /* Private function prototypes -----------------------------------------------*/
@@ -60,9 +60,9 @@ void SystemClock_Config(void);
 /* USER CODE END 0 */
 
 /**
-  * @brief  The application entry point.
-  * @retval int
-  */
+ * @brief  The application entry point.
+ * @retval int
+ */
 int main(void)
 {
 
@@ -93,9 +93,9 @@ int main(void)
   MX_TIM7_Init();
   /* USER CODE BEGIN 2 */
   MAX7219_HandleTypeDef hmax7219;
-  hmax7219.Init.hspi = &hspi1;
-  hmax7219.Init.CSPort = MAX1719_CS_GPIO_Port;
-  hmax7219.Init.CSPin = MAX1719_CS_Pin;
+  hmax7219.hspi = &hspi1;
+  hmax7219.CSPort = MAX1719_CS_GPIO_Port;
+  hmax7219.CSPin = MAX1719_CS_Pin;
   HAL_MAX7219_Init(&hmax7219);
 
   HAL_TIM_Base_Start_IT(&htim6);
@@ -107,55 +107,13 @@ int main(void)
 
   /* Infinite loop */
   /* USER CODE BEGIN WHILE */
-  HAL_GPIO_WritePin(MAX1719_CS_GPIO_Port, MAX1719_CS_Pin, GPIO_PIN_SET);
-
-  HAL_MAX7219_SendMessage(&hmax7219,
-                          HAL_MAX7219_ADDRESS_DISPLAY_TEST,
-                          HAL_MAX7219_COMMAND_TEST_DISABLE);
-
-  HAL_MAX7219_SendMessage(&hmax7219,
-                          HAL_MAX7219_ADDRESS_SHUTDOWN,
-                          HAL_MAX7219_COMMAND_NORMAL_OPERATION);
-
-  HAL_MAX7219_SendMessage(&hmax7219,
-                          HAL_MAX7219_ADDRESS_DECODE_MODE,
-                          HAL_MAX7219_COMMAND_CODE_B_DIGIT_7_0);
-
-  HAL_MAX7219_SendMessage(&hmax7219,
-                          HAL_MAX7219_ADDRESS_SCAN_LIMIT,
-                          HAL_MAX7219_COMMAND_SCAN_7_0);
-
-  HAL_MAX7219_SendMessage(&hmax7219,
-                          HAL_MAX7219_ADDRESS_INTENSITY,
-                          HAL_MAX7219_COMMAND_INTENSITY_MIN);
-
-  HAL_MAX7219_SendMessage(&hmax7219,
-                          HAL_MAX7219_ADDRESS_DIGIT_0,
-                          HAL_MAX7219_COMMAND_CODE_B_FONT_0);
-  HAL_MAX7219_SendMessage(&hmax7219,
-                          HAL_MAX7219_ADDRESS_DIGIT_1,
-                          HAL_MAX7219_COMMAND_CODE_B_FONT_1);
-  HAL_MAX7219_SendMessage(&hmax7219,
-                          HAL_MAX7219_ADDRESS_DIGIT_2,
-                          HAL_MAX7219_COMMAND_CODE_B_FONT_2);
-  HAL_MAX7219_SendMessage(&hmax7219,
-                          HAL_MAX7219_ADDRESS_DIGIT_3,
-                          HAL_MAX7219_COMMAND_CODE_B_FONT_3);
-  HAL_MAX7219_SendMessage(&hmax7219,
-                          HAL_MAX7219_ADDRESS_DIGIT_4,
-                          HAL_MAX7219_COMMAND_CODE_B_FONT_4);
-  HAL_MAX7219_SendMessage(&hmax7219,
-                          HAL_MAX7219_ADDRESS_DIGIT_5,
-                          HAL_MAX7219_COMMAND_CODE_B_FONT_5);
-  HAL_MAX7219_SendMessage(&hmax7219,
-                          HAL_MAX7219_ADDRESS_DIGIT_6,
-                          HAL_MAX7219_COMMAND_CODE_B_FONT_6);
-  HAL_MAX7219_SendMessage(&hmax7219,
-                          HAL_MAX7219_ADDRESS_DIGIT_7,
-                          HAL_MAX7219_COMMAND_CODE_B_FONT_7);
-
   while (1)
   {
+    /*! Toggle heartbeat LED every 1 s */
+    if(ten_ms_tick % 100 == 0) 
+    {
+      HAL_MAX7219_WriteInt(&hmax7219, ten_ms_tick/100);
+    }
     /* USER CODE END WHILE */
 
     /* USER CODE BEGIN 3 */
@@ -164,21 +122,21 @@ int main(void)
 }
 
 /**
-  * @brief System Clock Configuration
-  * @retval None
-  */
+ * @brief System Clock Configuration
+ * @retval None
+ */
 void SystemClock_Config(void)
 {
   RCC_OscInitTypeDef RCC_OscInitStruct = {0};
   RCC_ClkInitTypeDef RCC_ClkInitStruct = {0};
 
   /** Configure the main internal regulator output voltage
-  */
+   */
   HAL_PWREx_ControlVoltageScaling(PWR_REGULATOR_VOLTAGE_SCALE2);
 
   /** Initializes the RCC Oscillators according to the specified parameters
-  * in the RCC_OscInitTypeDef structure.
-  */
+   * in the RCC_OscInitTypeDef structure.
+   */
   RCC_OscInitStruct.OscillatorType = RCC_OSCILLATORTYPE_HSI;
   RCC_OscInitStruct.HSIState = RCC_HSI_ON;
   RCC_OscInitStruct.HSICalibrationValue = RCC_HSICALIBRATION_DEFAULT;
@@ -189,9 +147,8 @@ void SystemClock_Config(void)
   }
 
   /** Initializes the CPU, AHB and APB buses clocks
-  */
-  RCC_ClkInitStruct.ClockType = RCC_CLOCKTYPE_HCLK|RCC_CLOCKTYPE_SYSCLK
-                              |RCC_CLOCKTYPE_PCLK1;
+   */
+  RCC_ClkInitStruct.ClockType = RCC_CLOCKTYPE_HCLK | RCC_CLOCKTYPE_SYSCLK | RCC_CLOCKTYPE_PCLK1;
   RCC_ClkInitStruct.SYSCLKSource = RCC_SYSCLKSOURCE_HSI;
   RCC_ClkInitStruct.AHBCLKDivider = RCC_SYSCLK_DIV1;
   RCC_ClkInitStruct.APB1CLKDivider = RCC_HCLK_DIV1;
@@ -203,18 +160,20 @@ void SystemClock_Config(void)
 }
 
 /* USER CODE BEGIN 4 */
-void HAL_TIM_PeriodElapsedCallback(TIM_HandleTypeDef *htim) {
-  if (htim->Instance == TIM6) {
-    HAL_GPIO_TogglePin(TEST_PIN_GPIO_Port, TEST_PIN_Pin);
-    white_alarm++;
+void HAL_TIM_PeriodElapsedCallback(TIM_HandleTypeDef *htim)
+{
+  if (htim->Instance == TIM6)
+  {
+    // HAL_GPIO_TogglePin(TEST_PIN_GPIO_Port, TEST_PIN_Pin);
+    ten_ms_tick++;
   }
 }
 /* USER CODE END 4 */
 
 /**
-  * @brief  This function is executed in case of error occurrence.
-  * @retval None
-  */
+ * @brief  This function is executed in case of error occurrence.
+ * @retval None
+ */
 void Error_Handler(void)
 {
   /* USER CODE BEGIN Error_Handler_Debug */
@@ -226,14 +185,14 @@ void Error_Handler(void)
   /* USER CODE END Error_Handler_Debug */
 }
 
-#ifdef  USE_FULL_ASSERT
+#ifdef USE_FULL_ASSERT
 /**
-  * @brief  Reports the name of the source file and the source line number
-  *         where the assert_param error has occurred.
-  * @param  file: pointer to the source file name
-  * @param  line: assert_param error line source number
-  * @retval None
-  */
+ * @brief  Reports the name of the source file and the source line number
+ *         where the assert_param error has occurred.
+ * @param  file: pointer to the source file name
+ * @param  line: assert_param error line source number
+ * @retval None
+ */
 void assert_failed(uint8_t *file, uint32_t line)
 {
   /* USER CODE BEGIN 6 */
