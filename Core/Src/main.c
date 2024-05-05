@@ -101,8 +101,8 @@ int main(void)
 
   HAL_TIM_Base_Start_IT(&htim6);
 
-  Game.WhiteTick10ms = 10000;
-  Game.BlackTick10ms = 10000;
+  Game.WhiteTick10ms = 1000;
+  Game.BlackTick10ms = 1000;
 
   /* USER CODE END 2 */
 
@@ -178,11 +178,11 @@ void HAL_TIM_PeriodElapsedCallback(TIM_HandleTypeDef *htim)
   {
     if (Game.GameState == WHITE_TURN)
     {
-      Game.WhiteTick10ms++;
+      Game.WhiteTick10ms--;
     }
     else
     {
-      Game.BlackTick10ms++;
+      Game.BlackTick10ms--;
     }
   }
 }
