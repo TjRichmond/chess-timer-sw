@@ -61,9 +61,9 @@ void SystemClock_Config(void);
 /* USER CODE END 0 */
 
 /**
- * @brief  The application entry point.
- * @retval int
- */
+  * @brief  The application entry point.
+  * @retval int
+  */
 int main(void)
 {
 
@@ -101,8 +101,8 @@ int main(void)
 
   HAL_TIM_Base_Start_IT(&htim6);
 
-  Game.WhiteTick10ms = 1000;
-  Game.BlackTick10ms = 1000;
+  Game.GameState = NEW_GAME;
+  Game.MatchLength = LEN_10SEC;
 
   /* USER CODE END 2 */
 
@@ -122,21 +122,21 @@ int main(void)
 }
 
 /**
- * @brief System Clock Configuration
- * @retval None
- */
+  * @brief System Clock Configuration
+  * @retval None
+  */
 void SystemClock_Config(void)
 {
   RCC_OscInitTypeDef RCC_OscInitStruct = {0};
   RCC_ClkInitTypeDef RCC_ClkInitStruct = {0};
 
   /** Configure the main internal regulator output voltage
-   */
+  */
   HAL_PWREx_ControlVoltageScaling(PWR_REGULATOR_VOLTAGE_SCALE2);
 
   /** Initializes the RCC Oscillators according to the specified parameters
-   * in the RCC_OscInitTypeDef structure.
-   */
+  * in the RCC_OscInitTypeDef structure.
+  */
   RCC_OscInitStruct.OscillatorType = RCC_OSCILLATORTYPE_HSI;
   RCC_OscInitStruct.HSIState = RCC_HSI_ON;
   RCC_OscInitStruct.HSICalibrationValue = RCC_HSICALIBRATION_DEFAULT;
@@ -147,8 +147,9 @@ void SystemClock_Config(void)
   }
 
   /** Initializes the CPU, AHB and APB buses clocks
-   */
-  RCC_ClkInitStruct.ClockType = RCC_CLOCKTYPE_HCLK | RCC_CLOCKTYPE_SYSCLK | RCC_CLOCKTYPE_PCLK1;
+  */
+  RCC_ClkInitStruct.ClockType = RCC_CLOCKTYPE_HCLK|RCC_CLOCKTYPE_SYSCLK
+                              |RCC_CLOCKTYPE_PCLK1;
   RCC_ClkInitStruct.SYSCLKSource = RCC_SYSCLKSOURCE_HSI;
   RCC_ClkInitStruct.AHBCLKDivider = RCC_SYSCLK_DIV1;
   RCC_ClkInitStruct.APB1CLKDivider = RCC_HCLK_DIV1;
@@ -162,13 +163,36 @@ void SystemClock_Config(void)
 /* USER CODE BEGIN 4 */
 void HAL_GPIO_EXTI_Rising_Callback(uint16_t GPIO_Pin)
 {
-  if (GPIO_Pin == WHITE_BUTTON_Pin && Game.GameState == WHITE_TURN)
+  if (GPIO_Pin == WHITE_Pin && Game.GameState == WHITE_TURN)
   {
     Game.GameState = BLACK_TURN;
   }
-  if (GPIO_Pin == BLACK_BUTTON_Pin && Game.GameState == BLACK_TURN)
+  else if (GPIO_Pin == BLACK_Pin && Game.GameState == BLACK_TURN)
   {
     Game.GameState = WHITE_TURN;
+  }
+  else if (GPIO_Pin == NEW_GAME_Pin)
+  {
+    switch (Game.GameState)
+    {
+    case NEW_GAME:
+      Game.GameState = WHITE_TURN;
+      break;
+    default:
+      Game.GameState = NEW_GAME;
+      break;
+    }
+  }
+  else if (GPIO_Pin == MODE_SELECT_Pin)
+  {
+    if(Game.MatchLength == LEN_30MIN)
+    {
+      Game.MatchLength = LEN_10SEC;
+    }
+    else
+    {
+      Game.MatchLength++;
+    }
   }
 }
 
@@ -178,20 +202,43 @@ void HAL_TIM_PeriodElapsedCallback(TIM_HandleTypeDef *htim)
   {
     if (Game.GameState == WHITE_TURN)
     {
-      Game.WhiteTick10ms--;
+      if (Game.WhiteTick10ms % 10000 == 0)
+      {
+        Game.WhiteTick10ms -= 4000;
+      }
+      else
+      {
+        Game.WhiteTick10ms--;
+      }
     }
-    else
+    else if (Game.GameState == BLACK_TURN)
     {
-      Game.BlackTick10ms--;
+      if (Game.BlackTick10ms % 10000 == 0)
+      {
+        Game.BlackTick10ms -= 4000;
+      }
+      else
+      {
+        Game.BlackTick10ms--;
+      }
+    }
+    else if (Game.GameState == GAME_OVER)
+    {
+      Game.WinnerTick10ms++;
+      if (Game.WinnerTick10ms > 99)
+      {
+        Game.WinnerTick10ms = 0;
+        Game.GameOverBlink = !Game.GameOverBlink;
+      }
     }
   }
 }
 /* USER CODE END 4 */
 
 /**
- * @brief  This function is executed in case of error occurrence.
- * @retval None
- */
+  * @brief  This function is executed in case of error occurrence.
+  * @retval None
+  */
 void Error_Handler(void)
 {
   /* USER CODE BEGIN Error_Handler_Debug */
@@ -203,14 +250,14 @@ void Error_Handler(void)
   /* USER CODE END Error_Handler_Debug */
 }
 
-#ifdef USE_FULL_ASSERT
+#ifdef  USE_FULL_ASSERT
 /**
- * @brief  Reports the name of the source file and the source line number
- *         where the assert_param error has occurred.
- * @param  file: pointer to the source file name
- * @param  line: assert_param error line source number
- * @retval None
- */
+  * @brief  Reports the name of the source file and the source line number
+  *         where the assert_param error has occurred.
+  * @param  file: pointer to the source file name
+  * @param  line: assert_param error line source number
+  * @retval None
+  */
 void assert_failed(uint8_t *file, uint32_t line)
 {
   /* USER CODE BEGIN 6 */

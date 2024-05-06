@@ -14,22 +14,49 @@ extern "C"
 
   typedef enum
   {
+    NEW_GAME,
+    START_GAME,
     WHITE_TURN,
     BLACK_TURN,
-    NEW_GAME,
     GAME_OVER
   } GameStateTypeDef;
+
+  typedef enum
+  {
+    NO_WIN,
+    WHITE_WIN,
+    BLACK_WIN
+  } WinnerTypeDef;
+
+  typedef enum
+  {
+    LEN_10SEC,
+    LEN_1MIN,
+    LEN_3MIN,
+    LEN_5MIN,
+    LEN_10MIN,
+    LEN_30MIN
+  } MatchLengthTypeDef;
+
+  typedef enum
+  {
+    BLINK_OFF,
+    BLINK_ON
+  } GameOverTypeDef;
 
   typedef struct _ChessGame
   {
     GameStateTypeDef GameState;
     uint32_t WhiteTick10ms;
     uint32_t BlackTick10ms;
+    uint8_t WinnerTick10ms;
+    uint32_t TotalTime;
+    GameOverTypeDef GameOverBlink;
+    WinnerTypeDef Winner;
+    MatchLengthTypeDef MatchLength;
   } ChessGame;
 
   void GameLoop(MAX7219_HandleTypeDef *hmax7219, ChessGame *Game);
-
-  
 
 #ifdef __cplusplus
 }

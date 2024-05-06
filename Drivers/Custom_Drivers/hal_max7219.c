@@ -50,7 +50,7 @@ HAL_StatusTypeDef HAL_MAX7219_Init(
     hmax7219->Display[i] = MAX7219_CODE_B_BLANK;
     HAL_MAX7219_SendMessage(hmax7219,
                             i + 1,
-                            MAX7219_CODE_B_BLANK);
+                            MAX7219_CODE_B_DP_BLANK);
   }
 
   return HAL_OK;
