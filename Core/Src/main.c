@@ -25,6 +25,7 @@
 /* Private includes ----------------------------------------------------------*/
 /* USER CODE BEGIN Includes */
 #include "hal_max7219.h"
+#include "hal_ls027b7.h"
 #include "chess.h"
 /* USER CODE END Includes */
 
@@ -93,17 +94,25 @@ int main(void)
   MX_TIM6_Init();
   MX_TIM7_Init();
   /* USER CODE BEGIN 2 */
-  MAX7219_HandleTypeDef hmax7219;
-  hmax7219.hspi = &hspi1;
-  hmax7219.CSPort = MAX1719_CS_GPIO_Port;
-  hmax7219.CSPin = MAX1719_CS_Pin;
-  HAL_MAX7219_Init(&hmax7219);
+  // MAX7219_HandleTypeDef hmax7219;
+  // hmax7219.hspi = &hspi1;
+  // hmax7219.CSPort = MAX1719_CS_GPIO_Port;
+  // hmax7219.CSPin = MAX1719_CS_Pin;
+  // HAL_MAX7219_Init(&hmax7219);
 
-  HAL_TIM_Base_Start_IT(&htim6);
+  // HAL_TIM_Base_Start_IT(&htim6);
 
-  Game.GameState = NEW_GAME;
-  Game.MatchLength = LEN_10SEC;
+  // Game.GameState = NEW_GAME;
+  // Game.MatchLength = LEN_10SEC;
+  LS027B7_HandleTypeDef hls027b7;
+  hls027b7.hspi = &hspi1;
+  hls027b7.CSPort = MAX1719_CS_GPIO_Port;
+  hls027b7.CSPin = MAX1719_CS_Pin;
+  HAL_LS027B7_Init(&hls027b7);
 
+  HAL_LS027B7_ClearDisplay(&hls027b7);
+  HAL_LS027B7_DrawLine(&hls027b7, (uint8_t)20);
+  HAL_LS027B7_DrawPixel(&hls027b7, (uint8_t)200, (uint8_t)200);
   /* USER CODE END 2 */
 
   /* Initialize leds */
@@ -113,7 +122,8 @@ int main(void)
   /* USER CODE BEGIN WHILE */
   while (1)
   {
-    GameLoop(&hmax7219, &Game);
+    // GameLoop(&hmax7219, &Game);
+    // HAL_LS027B7_DrawLine(&hls027b7, (uint8_t)69);
     /* USER CODE END WHILE */
 
     /* USER CODE BEGIN 3 */
