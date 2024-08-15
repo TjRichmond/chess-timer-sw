@@ -112,8 +112,9 @@ int main(void)
 
   HAL_LS027B7_ClearDisplay(&hls027b7);
   HAL_LS027B7_DrawLine(&hls027b7, (uint8_t)120);
-  HAL_LS027B7_DrawPixel(&hls027b7, (uint8_t)100, (uint8_t)200);
-  HAL_LS027B7_DrawChar(&hls027b7, 24, 24);
+  HAL_LS027B7_DrawPixel(&hls027b7, (uint8_t)10, (uint8_t)10);
+  HAL_LS027B7_DrawChar(&hls027b7, 24, 24, 'B');
+  HAL_LS027B7_DrawString(&hls027b7, 50, 100, "test", 4);
   /* USER CODE END 2 */
 
   /* Initialize leds */

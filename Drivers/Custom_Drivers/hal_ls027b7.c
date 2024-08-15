@@ -54,12 +54,13 @@ HAL_StatusTypeDef HAL_LS027B7_Init(
 HAL_StatusTypeDef HAL_LS027B7_DrawChar(
   LS027B7_HandleTypeDef *hls027b7,
   uint8_t x,
-  uint8_t y
+  uint8_t y,
+  uint8_t c
 )
 {
   uint8_t i;
   for (i = 0; i < 8; i++) {
-    hls027b7->DisplayData[y + i][LS027B7_X_TO_BYTE(x) + LS027B7_MSG_COL_START] &= ~(cp437[33][i]);
+    hls027b7->DisplayData[y + i][LS027B7_X_TO_BYTE(x) + LS027B7_MSG_COL_START] &= ~(cp437[c][i]);
   }
   
   updateRows(hls027b7, y, y + 7);
@@ -67,6 +68,26 @@ HAL_StatusTypeDef HAL_LS027B7_DrawChar(
   return HAL_OK;
 }
 
+HAL_StatusTypeDef HAL_LS027B7_DrawString(
+  LS027B7_HandleTypeDef *hls027b7,
+  uint8_t x,
+  uint8_t y,
+  char* string,
+  uint8_t stringSize
+)
+{
+  uint8_t i, j;
+  for (j = 0; j < stringSize; j++) {
+    for (i = 0; i < 8; i++) {
+      hls027b7->DisplayData[y + i][LS027B7_X_TO_BYTE(x) + LS027B7_MSG_COL_START + j*8] &=
+       ~(cp437[string[j]][i]);
+    }
+  }
+
+  updateRows(hls027b7, y, y + 7);
+
+  return HAL_OK;
+}
 
 /**
  * @brief Draw as line between two given coordinates

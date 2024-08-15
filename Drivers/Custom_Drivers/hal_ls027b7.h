@@ -54,7 +54,16 @@ HAL_StatusTypeDef HAL_LS027B7_Init(
 HAL_StatusTypeDef HAL_LS027B7_DrawChar(
   LS027B7_HandleTypeDef *hls027b7,
   uint8_t x,
-  uint8_t y
+  uint8_t y,
+  uint8_t c
+);
+
+HAL_StatusTypeDef HAL_LS027B7_DrawString(
+  LS027B7_HandleTypeDef *hls027b7,
+  uint8_t x,
+  uint8_t y,
+  char* string,
+  uint8_t stringSize
 );
 
 HAL_StatusTypeDef HAL_LS027B7_DrawLine(
